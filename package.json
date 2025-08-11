@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-orgo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "n8n node for integrating with Orgo - Multi-tenant SaaS platform for organizations",
   "keywords": [
     "n8n-community-node-package",
