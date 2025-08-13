@@ -1,10 +1,29 @@
 import {
 	IExecuteFunctions,
+	IExecuteSingleFunctions,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
 } from 'n8n-workflow';
+
+// Route validation helper
+function validateRoute(url: string, method: string, requiredParams: string[] = []): void {
+	// Check if URL has proper API version prefix
+	if (!url.startsWith('/api/v1/')) {
+		console.warn(`[Orgo Node] Route integrity warning: URL "${url}" does not start with /api/v1/`);
+	}
+	
+	// Check for required parameters in URL template
+	for (const param of requiredParams) {
+		if (!url.includes(`{{$parameter["${param}"]}}`)) {
+			console.error(`[Orgo Node] Route integrity error: Missing required parameter "${param}" in URL "${url}"`);
+		}
+	}
+	
+	// Log route validation
+	console.log(`[Orgo Node] Route validated: ${method} ${url}`);
+}
 
 export class Orgo implements INodeType {
 	description: INodeTypeDescription = {
@@ -12,7 +31,7 @@ export class Orgo implements INodeType {
 		name: 'orgo',
 		icon: 'file:orgo.svg',
 		group: ['input'],
-		version: 1,
+		version: 1.1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Interact with Orgo API - Multi-tenant SaaS platform for organizations',
 		defaults: {
@@ -97,6 +116,22 @@ export class Orgo implements INodeType {
 								method: 'GET',
 								url: '=/api/v1/users/{{$parameter["id"]}}',
 							},
+							send: {
+								preSend: [
+									async function(this: IExecuteSingleFunctions, requestOptions: any) {
+										validateRoute('/api/v1/users/{{$parameter["id"]}}', 'GET', ['id']);
+										const id = this.getNodeParameter('id') as string;
+										if (!id || id.trim() === '') {
+											throw new Error('[Orgo Node] User ID is required but not provided');
+										}
+										const credentials = await this.getCredentials('orgoApi');
+										console.log(`[Orgo Node] Getting user with ID: ${id}`);
+										console.log(`[Orgo Node] Making GET request to: /api/v1/users/${id}`);
+										console.log(`[Orgo Node] Base URL: ${credentials?.apiUrl}`);
+										return requestOptions;
+									},
+								],
+							},
 						},
 					},
 					{
@@ -108,6 +143,17 @@ export class Orgo implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=/api/v1/users?limit={{$parameter["limit"] || 25}}',
+							},
+							send: {
+								preSend: [
+									async function(this: IExecuteSingleFunctions, requestOptions: any) {
+										validateRoute('/api/v1/users', 'GET', []);
+										const limit = this.getNodeParameter('limit', 25) as number;
+										console.log(`[Orgo Node] Getting users with limit: ${limit}`);
+										console.log(`[Orgo Node] Making GET request to: /api/v1/users?limit=${limit}`);
+										return requestOptions;
+									},
+								],
 							},
 						},
 					},
@@ -521,15 +567,79 @@ export class Orgo implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		// Since we're using routing, n8n will handle the API calls automatically
-		// This execute function is kept for compatibility but may not be called
 		const returnData: INodeExecutionData[] = [];
+		const resource = this.getNodeParameter('resource', 0) as string;
+		const operation = this.getNodeParameter('operation', 0) as string;
+		const credentials = await this.getCredentials('orgoApi');
+		
+		console.log(`[Orgo Node] Executing ${operation} on ${resource}`);
+		console.log(`[Orgo Node] Credentials Base URL: ${credentials?.apiUrl}`);
+		
 		const items = this.getInputData();
-
-		for (let i = 0; i < items.length; i++) {
-			returnData.push({ json: items[i].json });
+		
+		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+			try {
+				let responseData;
+				const baseURL = credentials.apiUrl as string;
+				
+				// Log request details
+				console.log(`[Orgo Node] Processing item ${itemIndex + 1}/${items.length}`);
+				
+				if (resource === 'user') {
+					if (operation === 'get') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/users/${id}`;
+						console.log(`[Orgo Node] GET request to: ${url}`);
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						console.log(`[Orgo Node] Response received:`, response);
+						responseData = response;
+					} else if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const url = `${baseURL}/api/v1/users?limit=${limit}`;
+						console.log(`[Orgo Node] GET request to: ${url}`);
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						console.log(`[Orgo Node] Response received:`, response);
+						responseData = response;
+					}
+				}
+				
+				// Add similar blocks for other resources (event, productPayment, webhook)
+				
+				if (Array.isArray(responseData)) {
+					returnData.push(...responseData.map(item => ({ json: item })));
+				} else if (responseData) {
+					returnData.push({ json: responseData });
+				}
+				
+			} catch (error) {
+				console.error(`[Orgo Node] Error processing item ${itemIndex}:`, error);
+				if (this.continueOnFail()) {
+					returnData.push({ json: { error: error.message } });
+					continue;
+				}
+				throw error;
+			}
 		}
-
+		
+		console.log(`[Orgo Node] Execution complete. Returned ${returnData.length} items`);
 		return [returnData];
 	}
 }

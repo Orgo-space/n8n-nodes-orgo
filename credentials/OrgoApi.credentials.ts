@@ -8,7 +8,7 @@ import {
 export class OrgoApi implements ICredentialType {
 	name = 'orgoApi';
 	displayName = 'Orgo API';
-	documentationUrl = 'https://app.orgo.space/docs/api';
+	documentationUrl = 'https://docs.orgo.space/api-reference';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Base URL',
@@ -62,7 +62,7 @@ export class OrgoApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.apiUrl}}',
-			url: '/users/me',
+			url: '/me',
 			method: 'GET',
 		},
 	};
