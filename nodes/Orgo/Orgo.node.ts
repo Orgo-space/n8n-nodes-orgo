@@ -121,7 +121,6 @@ export class Orgo implements INodeType {
 										if (!id || id.trim() === '') {
 											throw new Error('[Orgo Node] User ID is required but not provided');
 										}
-										const credentials = await this.getCredentials('orgoApi');
 										return requestOptions;
 									},
 								],
@@ -142,7 +141,6 @@ export class Orgo implements INodeType {
 								preSend: [
 									async function(this: IExecuteSingleFunctions, requestOptions: any) {
 										validateRoute('/api/v1/users', 'GET', []);
-										const limit = this.getNodeParameter('limit', 25) as number;
 										return requestOptions;
 									},
 								],
