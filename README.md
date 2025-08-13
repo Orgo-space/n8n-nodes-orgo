@@ -89,7 +89,7 @@ To use the Orgo nodes, you need to configure API credentials in n8n:
 ### Required Fields
 1. **API Base URL**: Your Orgo instance API base URL
    - Format: `https://your-domain.com` (without `/api/v1`)
-   - Example: `https://app.orgo.space` or `https://membri.scout.ro`
+   - Example: `https://app.orgo.space`
 
 2. **API Token**: Your personal API token from Orgo
    - Generated from your Orgo account settings
@@ -102,7 +102,7 @@ To use the Orgo nodes, you need to configure API credentials in n8n:
 ### Getting Your API Token
 
 1. Log into your Orgo account
-2. Navigate to **Settings > API Access** or **Account Settings**
+2. Navigate to **Organization Settings > API & OAuth -> API
 3. Generate a new API token or copy an existing one
 4. Copy the token and paste it into your n8n Orgo API credentials
 
@@ -377,17 +377,6 @@ Enable n8n debug logging to troubleshoot issues:
 ```bash
 N8N_LOG_LEVEL=debug n8n start
 ```
-
-## Contributing
-
-We welcome contributions! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
 ## Support
 
 - **GitHub Issues**: [Report bugs and request features](https://github.com/Orgo-space/n8n-nodes-orgo/issues)
