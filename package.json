@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/orgo-official/n8n-nodes-orgo.git"
+    "url": "https://github.com/orgo-space/n8n-nodes-orgo.git"
   },
   "engines": {
     "node": ">=20.15"
