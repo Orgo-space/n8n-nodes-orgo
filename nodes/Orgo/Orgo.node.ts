@@ -11,18 +11,15 @@ import {
 function validateRoute(url: string, method: string, requiredParams: string[] = []): void {
 	// Check if URL has proper API version prefix
 	if (!url.startsWith('/api/v1/')) {
-		console.warn(`[Orgo Node] Route integrity warning: URL "${url}" does not start with /api/v1/`);
-	}
+		}
 	
 	// Check for required parameters in URL template
 	for (const param of requiredParams) {
 		if (!url.includes(`{{$parameter["${param}"]}}`)) {
-			console.error(`[Orgo Node] Route integrity error: Missing required parameter "${param}" in URL "${url}"`);
-		}
+			}
 	}
 	
 	// Log route validation
-	console.log(`[Orgo Node] Route validated: ${method} ${url}`);
 }
 
 export class Orgo implements INodeType {
@@ -125,9 +122,6 @@ export class Orgo implements INodeType {
 											throw new Error('[Orgo Node] User ID is required but not provided');
 										}
 										const credentials = await this.getCredentials('orgoApi');
-										console.log(`[Orgo Node] Getting user with ID: ${id}`);
-										console.log(`[Orgo Node] Making GET request to: /api/v1/users/${id}`);
-										console.log(`[Orgo Node] Base URL: ${credentials?.apiUrl}`);
 										return requestOptions;
 									},
 								],
@@ -149,8 +143,6 @@ export class Orgo implements INodeType {
 									async function(this: IExecuteSingleFunctions, requestOptions: any) {
 										validateRoute('/api/v1/users', 'GET', []);
 										const limit = this.getNodeParameter('limit', 25) as number;
-										console.log(`[Orgo Node] Getting users with limit: ${limit}`);
-										console.log(`[Orgo Node] Making GET request to: /api/v1/users?limit=${limit}`);
 										return requestOptions;
 									},
 								],
@@ -224,6 +216,122 @@ export class Orgo implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=/api/v1/events?limit={{$parameter["limit"] || 25}}',
+							},
+						},
+					},
+				],
+				default: 'get',
+			},
+
+			// Event Attendance operations
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['eventAttend'],
+					},
+				},
+				options: [
+					{
+						name: 'Get',
+						value: 'get',
+						description: 'Get an event attendance by ID',
+						action: 'Get an event attendance',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/api/v1/event_attends/{{$parameter["id"]}}',
+							},
+						},
+					},
+					{
+						name: 'Get Many',
+						value: 'getAll',
+						description: 'Get multiple event attendances',
+						action: 'Get many event attendances',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/api/v1/event_attends?limit={{$parameter["limit"] || 25}}',
+							},
+						},
+					},
+					{
+						name: 'Create',
+						value: 'create',
+						description: 'Register for an event',
+						action: 'Register for event',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=/api/v1/event_attends',
+							},
+						},
+					},
+					{
+						name: 'Update',
+						value: 'update',
+						description: 'Update an event attendance',
+						action: 'Update an event attendance',
+						routing: {
+							request: {
+								method: 'PUT',
+								url: '=/api/v1/event_attends/{{$parameter["id"]}}',
+							},
+						},
+					},
+					{
+						name: 'Delete',
+						value: 'delete',
+						description: 'Cancel event registration',
+						action: 'Cancel event registration',
+						routing: {
+							request: {
+								method: 'DELETE',
+								url: '=/api/v1/event_attends/{{$parameter["id"]}}',
+							},
+						},
+					},
+				],
+				default: 'get',
+			},
+
+			// Contract operations
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['contract'],
+					},
+				},
+				options: [
+					{
+						name: 'Get',
+						value: 'get',
+						description: 'Get a contract by ID',
+						action: 'Get a contract',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/api/v1/contracts/{{$parameter["id"]}}',
+							},
+						},
+					},
+					{
+						name: 'Get Many',
+						value: 'getAll',
+						description: 'Get multiple contracts',
+						action: 'Get many contracts',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/api/v1/contracts?limit={{$parameter["limit"] || 25}}',
 							},
 						},
 					},
@@ -427,6 +535,55 @@ export class Orgo implements INodeType {
 				description: 'The last name of the user',
 			},
 
+			// Event Attendance fields
+			{
+				displayName: 'Event ID',
+				name: 'eventId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['eventAttend'],
+						operation: ['create', 'update'],
+					},
+				},
+				default: '',
+				description: 'The ID of the event to register for',
+				required: true,
+			},
+			{
+				displayName: 'User ID',
+				name: 'userId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['eventAttend'],
+						operation: ['create', 'update'],
+					},
+				},
+				default: '',
+				description: 'The ID of the user registering for the event',
+				required: true,
+			},
+			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'options',
+				displayOptions: {
+					show: {
+						resource: ['eventAttend'],
+						operation: ['create', 'update'],
+					},
+				},
+				options: [
+					{ name: 'Registered', value: 'registered' },
+					{ name: 'Attended', value: 'attended' },
+					{ name: 'No Show', value: 'no_show' },
+					{ name: 'Cancelled', value: 'cancelled' },
+				],
+				default: 'registered',
+				description: 'The attendance status',
+			},
+
 			// Webhook fields
 			{
 				displayName: 'Name',
@@ -572,8 +729,6 @@ export class Orgo implements INodeType {
 		const operation = this.getNodeParameter('operation', 0) as string;
 		const credentials = await this.getCredentials('orgoApi');
 		
-		console.log(`[Orgo Node] Executing ${operation} on ${resource}`);
-		console.log(`[Orgo Node] Credentials Base URL: ${credentials?.apiUrl}`);
 		
 		const items = this.getInputData();
 		
@@ -582,14 +737,11 @@ export class Orgo implements INodeType {
 				let responseData;
 				const baseURL = credentials.apiUrl as string;
 				
-				// Log request details
-				console.log(`[Orgo Node] Processing item ${itemIndex + 1}/${items.length}`);
 				
 				if (resource === 'user') {
 					if (operation === 'get') {
 						const id = this.getNodeParameter('id', itemIndex) as string;
 						const url = `${baseURL}/api/v1/users/${id}`;
-						console.log(`[Orgo Node] GET request to: ${url}`);
 						
 						const response = await this.helpers.httpRequest({
 							method: 'GET',
@@ -600,12 +752,10 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						console.log(`[Orgo Node] Response received:`, response);
 						responseData = response;
 					} else if (operation === 'getAll') {
 						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
 						const url = `${baseURL}/api/v1/users?limit=${limit}`;
-						console.log(`[Orgo Node] GET request to: ${url}`);
 						
 						const response = await this.helpers.httpRequest({
 							method: 'GET',
@@ -616,12 +766,383 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						console.log(`[Orgo Node] Response received:`, response);
+						responseData = response;
+					} else if (operation === 'create') {
+						const email = this.getNodeParameter('email', itemIndex) as string;
+						const firstName = this.getNodeParameter('firstName', itemIndex) as string;
+						const lastName = this.getNodeParameter('lastName', itemIndex) as string;
+						
+						const body = {
+							email,
+							firstName,
+							lastName,
+						};
+						
+						const url = `${baseURL}/api/v1/users`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'POST',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						});
+						
+						responseData = response;
+					} else if (operation === 'update') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const email = this.getNodeParameter('email', itemIndex) as string;
+						const firstName = this.getNodeParameter('firstName', itemIndex) as string;
+						const lastName = this.getNodeParameter('lastName', itemIndex) as string;
+						
+						const body = {
+							email,
+							firstName,
+							lastName,
+						};
+						
+						const url = `${baseURL}/api/v1/users/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'PUT',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						});
+						
 						responseData = response;
 					}
+				} else if (resource === 'event') {
+					if (operation === 'get') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/events/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const url = `${baseURL}/api/v1/events?limit=${limit}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					}
+				} else if (resource === 'eventAttend') {
+					if (operation === 'get') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/event_attends/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const url = `${baseURL}/api/v1/event_attends?limit=${limit}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'create') {
+						const eventId = this.getNodeParameter('eventId', itemIndex) as string;
+						const userId = this.getNodeParameter('userId', itemIndex) as string;
+						const status = this.getNodeParameter('status', itemIndex, 'registered') as string;
+						
+						const body = {
+							eventId,
+							userId,
+							status,
+						};
+						
+						const url = `${baseURL}/api/v1/event_attends`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'POST',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						});
+						
+						responseData = response;
+					} else if (operation === 'update') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const eventId = this.getNodeParameter('eventId', itemIndex) as string;
+						const userId = this.getNodeParameter('userId', itemIndex) as string;
+						const status = this.getNodeParameter('status', itemIndex) as string;
+						
+						const body = {
+							eventId,
+							userId,
+							status,
+						};
+						
+						const url = `${baseURL}/api/v1/event_attends/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'PUT',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						});
+						
+						responseData = response;
+					} else if (operation === 'delete') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/event_attends/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'DELETE',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					}
+				} else if (resource === 'contract') {
+					if (operation === 'get') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/contracts/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const url = `${baseURL}/api/v1/contracts?limit=${limit}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					}
+				} else if (resource === 'productPayment') {
+					if (operation === 'get') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/product_payments/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const url = `${baseURL}/api/v1/product_payments?limit=${limit}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					}
+				} else if (resource === 'webhook') {
+					if (operation === 'get') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/webhook_subscriptions/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const url = `${baseURL}/api/v1/webhook_subscriptions?limit=${limit}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'GET',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'create') {
+						const name = this.getNodeParameter('name', itemIndex) as string;
+						const webhookUrl = this.getNodeParameter('url', itemIndex) as string;
+						const eventTypes = this.getNodeParameter('eventTypes', itemIndex) as string[];
+						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
+						
+						const body: any = {
+							name,
+							url: webhookUrl,
+							eventTypes,
+						};
+						
+						if (additionalFields.secret) body.secret = additionalFields.secret;
+						if (additionalFields.maxRetries) body.maxRetries = additionalFields.maxRetries;
+						if (additionalFields.timeoutSeconds) body.timeoutSeconds = additionalFields.timeoutSeconds;
+						if (additionalFields.description) body.description = additionalFields.description;
+						
+						const url = `${baseURL}/api/v1/webhook_subscriptions`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'POST',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						});
+						
+						responseData = response;
+					} else if (operation === 'update') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const name = this.getNodeParameter('name', itemIndex) as string;
+						const webhookUrl = this.getNodeParameter('url', itemIndex) as string;
+						const eventTypes = this.getNodeParameter('eventTypes', itemIndex) as string[];
+						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
+						
+						const body: any = {
+							name,
+							url: webhookUrl,
+							eventTypes,
+						};
+						
+						if (additionalFields.secret) body.secret = additionalFields.secret;
+						if (additionalFields.maxRetries) body.maxRetries = additionalFields.maxRetries;
+						if (additionalFields.timeoutSeconds) body.timeoutSeconds = additionalFields.timeoutSeconds;
+						if (additionalFields.description) body.description = additionalFields.description;
+						
+						const url = `${baseURL}/api/v1/webhook_subscriptions/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'PUT',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						});
+						
+						responseData = response;
+					} else if (operation === 'delete') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/webhook_subscriptions/${id}`;
+						
+						const response = await this.helpers.httpRequest({
+							method: 'DELETE',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					} else if (operation === 'test') {
+						const id = this.getNodeParameter('id', itemIndex) as string;
+						const url = `${baseURL}/api/v1/webhook_subscriptions/${id}/test`;
+						console.log(`[Orgo Node] POST request to: ${url}`);
+						
+						const response = await this.helpers.httpRequest({
+							method: 'POST',
+							url,
+							headers: {
+								'Api-Token': credentials.apiToken as string,
+								'Accept': 'application/json',
+							},
+						});
+						
+						responseData = response;
+					}
+				} else if (resource === 'custom') {
+					const customUrl = this.getNodeParameter('url', itemIndex) as string;
+					const url = `${baseURL}${customUrl}`;
+					console.log(`[Orgo Node] GET request to: ${url}`);
+					
+					const response = await this.helpers.httpRequest({
+						method: 'GET',
+						url,
+						headers: {
+							'Api-Token': credentials.apiToken as string,
+							'Accept': 'application/json',
+						},
+					});
+					
+					console.log(`[Orgo Node] Response received:`, response);
+					responseData = response;
 				}
-				
-				// Add similar blocks for other resources (event, productPayment, webhook)
 				
 				if (Array.isArray(responseData)) {
 					returnData.push(...responseData.map(item => ({ json: item })));
@@ -630,7 +1151,6 @@ export class Orgo implements INodeType {
 				}
 				
 			} catch (error) {
-				console.error(`[Orgo Node] Error processing item ${itemIndex}:`, error);
 				if (this.continueOnFail()) {
 					returnData.push({ json: { error: error.message } });
 					continue;
@@ -639,7 +1159,6 @@ export class Orgo implements INodeType {
 			}
 		}
 		
-		console.log(`[Orgo Node] Execution complete. Returned ${returnData.length} items`);
 		return [returnData];
 	}
 }

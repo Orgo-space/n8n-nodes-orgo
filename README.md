@@ -1,6 +1,6 @@
 # n8n-nodes-orgo
 
-This is an n8n community node that provides integration with Orgo, a multi-tenant SaaS platform for organizations with emphasis on scouting and membership management.
+This is an n8n community node that provides comprehensive integration with Orgo, a multi-tenant SaaS platform for organizations specializing in membership management, event coordination, and community engagement.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -14,69 +14,130 @@ This is an n8n community node that provides integration with Orgo, a multi-tenan
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
+### Option 1: Community Nodes (Recommended)
 1. Go to **Settings > Community Nodes** in your n8n instance
 2. Select **Install** and enter `n8n-nodes-orgo`
 3. Click **Install**
 
-Alternatively, you can install it via npm in your n8n installation:
-
+### Option 2: Manual Installation
 ```bash
 npm install n8n-nodes-orgo
 ```
 
+After installation, restart your n8n instance to see the new nodes.
+
 ## Operations
 
-This package provides two nodes:
+This package provides two powerful nodes for comprehensive Orgo integration:
 
 ### Orgo Node
-The main node for interacting with the Orgo API.
+The main node for interacting with the Orgo API, supporting full CRUD operations across all resources.
 
-**Resources:**
-- **User**: Create, read, update user accounts and member information
-- **Event**: Manage events, registrations, and attendance
-- **Payment**: Access payment records and fee information
-- **Contract**: Handle digital contracts and signatures
-- **Webhook**: Manage webhook subscriptions
+**Available Resources:**
+
+#### **User Management**
+- **Get User**: Retrieve user details by ID
+- **Get Many Users**: List multiple users with pagination
+- **Create User**: Register new users with email, first name, and last name
+- **Update User**: Modify existing user information
+
+#### **Event Management**  
+- **Get Event**: Retrieve event details by ID
+- **Get Many Events**: List multiple events with pagination
+
+#### **Event Attendance**
+- **Get Attendance**: Retrieve attendance record by ID
+- **Get Many Attendances**: List attendance records with pagination
+- **Register for Event**: Create new event registration
+- **Update Attendance**: Modify attendance status (registered, attended, no_show, cancelled)
+- **Cancel Registration**: Remove event attendance
+
+#### **Contract Management**
+- **Get Contract**: Retrieve contract details by ID
+- **Get Many Contracts**: List multiple contracts with pagination
+
+#### **Payment Management**
+- **Get Payment**: Retrieve payment record by ID  
+- **Get Many Payments**: List payment records with pagination
+
+#### **Webhook Management**
+- **Get Webhook**: Retrieve webhook subscription by ID
+- **Get Many Webhooks**: List webhook subscriptions
+- **Create Webhook**: Set up new webhook subscriptions
+- **Update Webhook**: Modify webhook configuration
+- **Delete Webhook**: Remove webhook subscriptions
+- **Test Webhook**: Send test webhook event
+
+#### **Custom Endpoints**
+- **Custom Request**: Make requests to any Orgo API endpoint
 
 ### Orgo Trigger Node
-A trigger node that responds to Orgo webhooks for real-time automation.
+A trigger node that responds to Orgo webhooks for real-time automation and event-driven workflows.
 
-**Supported Events:**
-- User events (created, updated, deleted)
-- Payment events (created, updated, deleted)
-- Event attendance (created, updated, deleted)
-- Contract events (created, updated, deleted)  
-- User role events (created, updated, deleted)
-- External profile events (created, updated, deleted)
+**Supported Event Types:**
+- **User Events**: `user.created`, `user.updated`, `user.deleted`
+- **Payment Events**: `product_payment.created`, `product_payment.updated`, `product_payment.deleted`
+- **Event Attendance**: `event_attend.created`, `event_attend.updated`, `event_attend.deleted`
+- **Contract Events**: `contract_user.created`, `contract_user.updated`, `contract_user.deleted`
+- **User Role Events**: `user_role.created`, `user_role.updated`, `user_role.deleted`
+- **External Profile Events**: `profile_external.created`, `profile_external.updated`, `profile_external.deleted`
 
 ## Credentials
 
-You need to create Orgo API credentials in n8n:
+To use the Orgo nodes, you need to configure API credentials in n8n:
 
-1. **API Base URL**: Your Orgo instance URL (e.g., `https://app.orgo.space/api/v1`)
-2. **API Token**: Your API token from Orgo account settings
-3. **Webhook Secret** (optional): For webhook signature verification
-4. **Tenant ID** (optional): Your organization ID (auto-detected if not provided)
+### Required Fields
+1. **API Base URL**: Your Orgo instance API base URL
+   - Format: `https://your-domain.com` (without `/api/v1`)
+   - Example: `https://app.orgo.space` or `https://membri.scout.ro`
+
+2. **API Token**: Your personal API token from Orgo
+   - Generated from your Orgo account settings
+   - Used for authentication with the Orgo API
+
+### Optional Fields
+3. **Webhook Secret**: Secret key for webhook signature verification (recommended for security)
+4. **Tenant ID**: Your organization/tenant ID (auto-detected if not provided)
 
 ### Getting Your API Token
 
 1. Log into your Orgo account
-2. Go to **Settings > API Access** 
-3. Generate or copy your API token
-4. Copy the token and paste it into your n8n credentials
+2. Navigate to **Settings > API Access** or **Account Settings**
+3. Generate a new API token or copy an existing one
+4. Copy the token and paste it into your n8n Orgo API credentials
+
+### Testing Your Credentials
+
+The credential configuration includes a built-in test that verifies:
+- API connectivity to your Orgo instance
+- Token validity and permissions
+- Proper API base URL configuration
+
+## API Documentation
+
+For detailed API reference, visit: [docs.orgo.space/api-reference](https://docs.orgo.space/api-reference)
+
+The Orgo API provides comprehensive endpoints for:
+- User and identity management
+- Event and attendance tracking
+- Payment and subscription handling
+- Contract and document management
+- Profile and badge systems
+- Voting and discussion features
 
 ## Webhook Setup
 
-The Orgo Trigger node automatically manages webhook subscriptions:
+The Orgo Trigger node provides automated webhook management:
 
-1. **Automatic Registration**: When you activate a workflow with an Orgo Trigger, it automatically creates a webhook subscription in Orgo
-2. **Event Filtering**: Select only the events you want to trigger your workflow
-3. **Signature Verification**: Enable webhook signature verification for security
-4. **Automatic Cleanup**: When you deactivate the workflow, the webhook is automatically removed
+### Automatic Management
+- **Auto-Registration**: Webhooks are automatically created when workflows are activated
+- **Auto-Cleanup**: Webhooks are automatically removed when workflows are deactivated
+- **Event Filtering**: Subscribe only to the events you need
+- **Signature Verification**: Optional webhook signature validation for security
 
 ### Webhook Payload Structure
 
-Orgo webhooks use a standardized payload format:
+Orgo webhooks deliver standardized payloads:
 
 ```json
 {
@@ -106,22 +167,26 @@ Orgo webhooks use a standardized payload format:
 }
 ```
 
-In your n8n workflow, you can access:
-- `{{$json.object}}` - The main entity data
-- `{{$json.event}}` - The event type (e.g., "user.created")  
-- `{{$json.previous_attributes}}` - Changes for update events
-- `{{$json.is_update}}` - Boolean indicating if this is an update event
-- `{{$json.tenant_id}}` - The organization ID
+### Accessing Webhook Data in n8n
+
+In your workflow, access webhook data using:
+- `{{$json.object}}` - Main entity data
+- `{{$json.event}}` - Event type (e.g., "user.created")
+- `{{$json.previous_attributes}}` - Changed fields for update events
+- `{{$json.tenant_id}}` - Organization ID
+- `{{$json.created}}` - Event timestamp
 
 ## Example Workflows
 
 ### User Registration Automation
+Automatically welcome new users and sync them to external systems:
+
 ```json
 {
-  "name": "Orgo New User Welcome",
+  "name": "New User Onboarding",
   "nodes": [
     {
-      "name": "Orgo Trigger",
+      "name": "Orgo User Created",
       "type": "n8n-nodes-orgo.orgoTrigger",
       "parameters": {
         "events": ["user.created"],
@@ -133,21 +198,21 @@ In your n8n workflow, you can access:
       "type": "n8n-nodes-base.emailSend",
       "parameters": {
         "toEmail": "={{$json.object.email}}",
-        "subject": "Welcome to our organization!",
-        "text": "Hello {{$json.object.firstName}}, welcome to our platform!"
+        "subject": "Welcome to {{$json.object.organization}}!",
+        "text": "Hello {{$json.object.firstName}}, welcome to our community!"
       }
     },
     {
-      "name": "Add to CRM",
+      "name": "Create CRM Contact",
       "type": "n8n-nodes-base.httpRequest",
       "parameters": {
         "method": "POST",
         "url": "https://your-crm.com/api/contacts",
-        "bodyParametersJson": {
+        "body": {
           "email": "={{$json.object.email}}",
-          "firstName": "={{$json.object.firstName}}",
-          "lastName": "={{$json.object.lastName}}",
-          "source": "orgo_webhook"
+          "first_name": "={{$json.object.firstName}}",
+          "last_name": "={{$json.object.lastName}}",
+          "source": "orgo_registration"
         }
       }
     }
@@ -155,14 +220,52 @@ In your n8n workflow, you can access:
 }
 ```
 
-### Payment Processing
+### Event Registration Management
+Handle event registrations and send confirmations:
+
 ```json
 {
-  "name": "Orgo Payment Handler",
+  "name": "Event Registration Handler",
   "nodes": [
     {
-      "name": "Orgo Trigger",
-      "type": "n8n-nodes-orgo.orgoTrigger", 
+      "name": "Event Registration",
+      "type": "n8n-nodes-orgo.orgoTrigger",
+      "parameters": {
+        "events": ["event_attend.created"]
+      }
+    },
+    {
+      "name": "Get Event Details",
+      "type": "n8n-nodes-orgo.orgo",
+      "parameters": {
+        "resource": "event",
+        "operation": "get",
+        "id": "={{$json.object.eventId}}"
+      }
+    },
+    {
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "toEmail": "={{$json.object.user.email}}",
+        "subject": "Event Registration Confirmed: {{$node['Get Event Details'].json.title}}",
+        "html": "Your registration for {{$node['Get Event Details'].json.title}} on {{$node['Get Event Details'].json.date}} has been confirmed!"
+      }
+    }
+  ]
+}
+```
+
+### Payment Processing Workflow
+Automate payment confirmations and notifications:
+
+```json
+{
+  "name": "Payment Processing",
+  "nodes": [
+    {
+      "name": "Payment Events",
+      "type": "n8n-nodes-orgo.orgoTrigger",
       "parameters": {
         "events": ["product_payment.created", "product_payment.updated"]
       }
@@ -172,45 +275,136 @@ In your n8n workflow, you can access:
       "type": "n8n-nodes-base.switch",
       "parameters": {
         "dataPropertyName": "object.status",
-        "values": [
-          {"value": "success"},
-          {"value": "failed"}
-        ]
+        "rules": {
+          "values": [
+            {"value": "completed"},
+            {"value": "failed"},
+            {"value": "pending"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Send Receipt (Success)",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "toEmail": "={{$json.object.user.email}}",
+        "subject": "Payment Receipt - {{$json.object.amount}} {{$json.object.currency}}",
+        "text": "Thank you for your payment of {{$json.object.amount}} {{$json.object.currency}}."
       }
     }
   ]
 }
 ```
 
-## Multi-Tenant Support
+## Multi-Tenant Architecture
 
-Orgo is a multi-tenant platform. The nodes automatically handle tenant isolation:
+Orgo's multi-tenant design ensures data isolation and security:
 
-- All API requests are scoped to your organization
-- Webhook events include the `tenant_id` for proper filtering
-- User permissions are respected based on your account role
+- **Automatic Tenant Scoping**: All API requests are automatically scoped to your organization
+- **Tenant ID Inclusion**: Webhook events include `tenant_id` for proper filtering
+- **Permission Respect**: User permissions and access levels are automatically enforced
+- **Cross-Tenant Security**: No access to data from other organizations
 
-## Error Handling
+## Error Handling & Reliability
 
 The nodes include comprehensive error handling:
 
-- **API Errors**: Detailed error messages from the Orgo API
-- **Webhook Validation**: Signature verification prevents unauthorized requests  
-- **Rate Limiting**: Automatic retry with exponential backoff
-- **Connection Issues**: Graceful handling of network problems
+### API Error Handling
+- **Detailed Error Messages**: Clear error descriptions from the Orgo API
+- **HTTP Status Codes**: Proper handling of 4xx and 5xx responses
+- **Validation Errors**: Field-level validation error reporting
+
+### Webhook Reliability
+- **Signature Verification**: Prevents unauthorized webhook requests
+- **Payload Validation**: Ensures webhook data integrity
+- **Retry Logic**: Automatic retry for failed webhook deliveries
+
+### Network Resilience
+- **Connection Timeouts**: Configurable request timeouts
+- **Rate Limiting**: Automatic handling of API rate limits
+- **Graceful Degradation**: Continues operation during temporary outages
+
+## Performance & Best Practices
+
+### Pagination
+- Use the `limit` parameter to control response sizes
+- Default limit is 25 items per request
+- Implement pagination for large datasets
+
+### Webhook Events
+- Subscribe only to necessary events to reduce noise
+- Use event filtering to improve workflow performance
+- Enable signature verification for security
+
+### API Usage
+- Cache frequently accessed data when possible
+- Use batch operations for multiple related requests
+- Monitor API usage to stay within rate limits
 
 ## Compatibility
 
-This node has been tested with:
+**Tested Compatibility:**
 - n8n version 1.0.0 and above
 - Node.js 18.x and above
 - Orgo API version 2024-01
 
+**Browser Support:**
+- Works in all modern browsers that support n8n
+- Compatible with n8n Cloud and self-hosted instances
+
+## Troubleshooting
+
+### Common Issues
+
+**Authentication Errors**
+- Verify your API token is correct and hasn't expired
+- Ensure the API Base URL doesn't include `/api/v1`
+- Check that your account has the necessary permissions
+
+**Webhook Not Receiving Events**
+- Verify the webhook URL is accessible from the internet
+- Check that the selected events are being triggered in Orgo
+- Ensure webhook signature verification is properly configured
+
+**API Request Failures**
+- Confirm the Orgo instance is running and accessible
+- Check network connectivity and firewall settings
+- Verify the API endpoint exists and accepts the request method
+
+### Debug Mode
+Enable n8n debug logging to troubleshoot issues:
+```bash
+N8N_LOG_LEVEL=debug n8n start
+```
+
+## Contributing
+
+We welcome contributions! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## Support
+
+- **GitHub Issues**: [Report bugs and request features](https://github.com/Orgo-space/n8n-nodes-orgo/issues)
+- **n8n Community**: [Get help from the n8n community](https://community.n8n.io/)
+- **Orgo Documentation**: [docs.orgo.space/api-reference](https://docs.orgo.space/api-reference)
+
 ## Resources
 
-- [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
+- [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
 - [Orgo Platform](https://app.orgo.space)
+- [Orgo API Documentation](https://docs.orgo.space/api-reference)
+- [n8n Workflow Examples](https://n8n.io/workflows/)
 
 ## License
 
-[MIT](https://github.com/your-username/n8n-nodes-orgo/blob/master/LICENSE.md)
+[MIT](LICENSE.md)
+
+---
+
+**Keywords**: n8n, community-node, orgo, webhook, automation, workflow, membership-management, event-management, api-integration
