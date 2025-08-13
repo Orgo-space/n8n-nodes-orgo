@@ -5,6 +5,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 // Route validation helper
@@ -119,7 +120,7 @@ export class Orgo implements INodeType {
 										validateRoute('/api/v1/users/{{$parameter["id"]}}', 'GET', ['id']);
 										const id = this.getNodeParameter('id') as string;
 										if (!id || id.trim() === '') {
-											throw new Error('[Orgo Node] User ID is required but not provided');
+											throw new NodeOperationError(this.getNode(), 'User ID is required but not provided');
 										}
 										return requestOptions;
 									},
@@ -234,6 +235,30 @@ export class Orgo implements INodeType {
 				},
 				options: [
 					{
+						name: 'Create',
+						value: 'create',
+						description: 'Register for an event',
+						action: 'Register for event',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=/api/v1/event_attends',
+							},
+						},
+					},
+					{
+						name: 'Delete',
+						value: 'delete',
+						description: 'Cancel event registration',
+						action: 'Cancel event registration',
+						routing: {
+							request: {
+								method: 'DELETE',
+								url: '=/api/v1/event_attends/{{$parameter["id"]}}',
+							},
+						},
+					},
+					{
 						name: 'Get',
 						value: 'get',
 						description: 'Get an event attendance by ID',
@@ -258,18 +283,6 @@ export class Orgo implements INodeType {
 						},
 					},
 					{
-						name: 'Create',
-						value: 'create',
-						description: 'Register for an event',
-						action: 'Register for event',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '=/api/v1/event_attends',
-							},
-						},
-					},
-					{
 						name: 'Update',
 						value: 'update',
 						description: 'Update an event attendance',
@@ -277,18 +290,6 @@ export class Orgo implements INodeType {
 						routing: {
 							request: {
 								method: 'PUT',
-								url: '=/api/v1/event_attends/{{$parameter["id"]}}',
-							},
-						},
-					},
-					{
-						name: 'Delete',
-						value: 'delete',
-						description: 'Cancel event registration',
-						action: 'Cancel event registration',
-						routing: {
-							request: {
-								method: 'DELETE',
 								url: '=/api/v1/event_attends/{{$parameter["id"]}}',
 							},
 						},
