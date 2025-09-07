@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-orgo",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "n8n node for integrating with Orgo - Multi-tenant SaaS platform for organizations",
   "keywords": [
     "n8n-community-node-package",
@@ -12,7 +12,7 @@
     "scouting"
   ],
   "license": "MIT",
-  "homepage": "https://app.orgo.space",
+  "homepage": "https://orgo.space",
   "author": {
     "name": "Orgo Development Team",
     "email": "support@orgo.space"

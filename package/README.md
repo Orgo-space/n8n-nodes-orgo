@@ -80,7 +80,7 @@ A trigger node that responds to Orgo webhooks for real-time automation and event
 - **Event Attendance**: `event_attend.created`, `event_attend.updated`, `event_attend.deleted`
 - **Contract Events**: `contract_user.created`, `contract_user.updated`, `contract_user.deleted`
 - **User Role Events**: `user_role.created`, `user_role.updated`, `user_role.deleted`
-- **External Profile Events**: `profile_external.created`, `profile_external.updated`, `profile_external.deleted`
+- **Contact Events**: `contact.created`, `contact.updated`, `contact.deleted`
 
 ## Credentials
 
@@ -88,8 +88,9 @@ To use the Orgo nodes, you need to configure API credentials in n8n:
 
 ### Required Fields
 1. **API Base URL**: Your Orgo instance API base URL
-   - Format: `https://your-domain.com` (without `/api/v1`)
-   - Example: `https://app.orgo.space`
+   - Format: `https://your-domain.com/api/v1`
+   - Example: `https://app.orgo.space/api/v1`
+   - For local development: `http://localhost:8000/api/v1`
 
 2. **API Token**: Your personal API token from Orgo
    - Generated from your Orgo account settings
@@ -386,7 +387,7 @@ N8N_LOG_LEVEL=debug n8n start
 ## Resources
 
 - [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
-- [Orgo Platform](https://app.orgo.space)
+- [Orgo Platform](https://orgo.space)
 - [Orgo API Documentation](https://docs.orgo.space/api-reference)
 - [n8n Workflow Examples](https://n8n.io/workflows/)
 

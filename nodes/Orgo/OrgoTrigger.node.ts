@@ -45,6 +45,21 @@ export class OrgoTrigger implements INodeType {
 				type: 'multiOptions',
 				options: [
 					{
+						name: 'Contact Created',
+						value: 'contact.created',
+						description: 'Triggered when a contact is created',
+					},
+					{
+						name: 'Contact Deleted',
+						value: 'contact.deleted',
+						description: 'Triggered when a contact is deleted',
+					},
+					{
+						name: 'Contact Updated',
+						value: 'contact.updated',
+						description: 'Triggered when contact information is updated',
+					},
+					{
 						name: 'Contract Deleted',
 						value: 'contract_user.deleted',
 						description: 'Triggered when a contract is removed or cancelled',
@@ -73,21 +88,6 @@ export class OrgoTrigger implements INodeType {
 						name: 'Event Registration Cancelled',
 						value: 'event_attend.deleted',
 						description: 'Triggered when event registration is cancelled',
-					},
-					{
-						name: 'External Profile Created',
-						value: 'profile_external.created',
-						description: 'Triggered when an external profile is created',
-					},
-					{
-						name: 'External Profile Deleted',
-						value: 'profile_external.deleted',
-						description: 'Triggered when an external profile is deleted',
-					},
-					{
-						name: 'External Profile Updated',
-						value: 'profile_external.updated',
-						description: 'Triggered when external profile information is updated',
 					},
 					{
 						name: 'Payment Created',
@@ -309,7 +309,7 @@ export class OrgoTrigger implements INodeType {
 		const webhookPayload = body as IDataObject;
 		
 		// Validate that this is an Orgo webhook with the expected structure
-		if (!webhookPayload.id || !webhookPayload.event || !webhookPayload.data) {
+		if (!webhookPayload.id || !webhookPayload.event || !webhookPayload.object) {
 			throw new NodeOperationError(this.getNode(), 'Invalid Orgo webhook payload structure');
 		}
 
@@ -328,15 +328,15 @@ export class OrgoTrigger implements INodeType {
 							request: webhookPayload.request,
 							
 							// Main entity data (what most workflows will use)
-							object: (webhookPayload.data as IDataObject).object,
+							object: webhookPayload.object,
 							
 							// Change tracking for update events
-							previous_attributes: (webhookPayload.data as IDataObject).previous_attributes || {},
+							previous_attributes: webhookPayload.previous_attributes || null,
 							
 							// Helper fields for workflow logic
-							is_update: !!(webhookPayload.data as IDataObject).previous_attributes,
-							entity_type: (webhookPayload.event as string).split('.')[0], // e.g., 'user' from 'user.created'
-							operation: (webhookPayload.event as string).split('.')[1], // e.g., 'created' from 'user.created'
+							is_update: webhookPayload.is_update || false,
+							entity_type: webhookPayload.entity_type, // e.g., 'user', 'contract_user', 'product_payment', 'event_attend'
+							operation: webhookPayload.operation, // e.g., 'created', 'updated', 'deleted'
 							
 							// Original webhook payload for advanced use cases
 							_raw: webhookPayload,
