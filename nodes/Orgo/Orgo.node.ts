@@ -131,7 +131,7 @@ export class Orgo implements INodeType {
 					},
 					{
 						name: 'Get Many',
-						value: 'getAll',
+						value: 'getMany',
 						description: 'Get multiple users',
 						action: 'Get many users',
 						routing: {
@@ -220,9 +220,9 @@ export class Orgo implements INodeType {
 					},
 					{
 						name: 'Get Many',
-						value: 'getAll',
+						value: 'getMany',
 						description: 'Get multiple contacts',
-						action: 'Get contacts',
+						action: 'Get many contacts',
 						routing: {
 							request: {
 								method: 'GET',
@@ -272,7 +272,7 @@ export class Orgo implements INodeType {
 					},
 					{
 						name: 'Get Many',
-						value: 'getAll',
+						value: 'getMany',
 						description: 'Get multiple events',
 						action: 'Get many events',
 						routing: {
@@ -336,9 +336,9 @@ export class Orgo implements INodeType {
 					},
 					{
 						name: 'Get Many',
-						value: 'getAll',
+						value: 'getMany',
 						description: 'Get event registrations for a specific event',
-						action: 'Get event registrations',
+						action: 'Get many event registrations',
 						routing: {
 							request: {
 								method: 'GET',
@@ -388,7 +388,7 @@ export class Orgo implements INodeType {
 					},
 					{
 						name: 'Get Many',
-						value: 'getAll',
+						value: 'getMany',
 						description: 'Get multiple contract users',
 						action: 'Get many contract users',
 						routing: {
@@ -428,7 +428,7 @@ export class Orgo implements INodeType {
 					},
 					{
 						name: 'Get Many',
-						value: 'getAll',
+						value: 'getMany',
 						description: 'Get multiple payments',
 						action: 'Get many payments',
 						routing: {
@@ -474,7 +474,7 @@ export class Orgo implements INodeType {
 				description: 'The UUID of the event',
 			},
 
-			// User fields
+			// User required fields for create
 			{
 				displayName: 'Email',
 				name: 'email',
@@ -488,35 +488,41 @@ export class Orgo implements INodeType {
 				},
 				default: '',
 				description: 'The email address of the user',
+				required: true,
 			},
+			
+			// User additional fields for create
 			{
-				displayName: 'First Name',
-				name: 'firstName',
-				type: 'string',
+				displayName: 'Additional Fields',
+				name: 'additionalFields',
+				type: 'collection',
+				placeholder: 'Add Field',
 				displayOptions: {
 					show: {
 						resource: ['user'],
 						operation: ['create'],
 					},
 				},
-				default: '',
-				description: 'The first name of the user',
-			},
-			{
-				displayName: 'Last Name',
-				name: 'lastName',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: ['user'],
-						operation: ['create'],
+				default: {},
+				options: [
+					{
+						displayName: 'First Name',
+						name: 'firstName',
+						type: 'string',
+						default: '',
+						description: 'The first name of the user',
 					},
-				},
-				default: '',
-				description: 'The last name of the user',
+					{
+						displayName: 'Last Name',
+						name: 'lastName',
+						type: 'string',
+						default: '',
+						description: 'The last name of the user',
+					},
+				],
 			},
 
-			// Contact fields
+			// Contact required fields
 			{
 				displayName: 'First Name',
 				name: 'firstName',
@@ -545,38 +551,43 @@ export class Orgo implements INodeType {
 				description: 'Last name of the contact',
 				required: true,
 			},
+			
+			// Contact additional fields
 			{
-				displayName: 'Email',
-				name: 'email',
-				type: 'string',
-				placeholder: 'contact@example.com',
+				displayName: 'Additional Fields',
+				name: 'additionalFields',
+				type: 'collection',
+				placeholder: 'Add Field',
 				displayOptions: {
 					show: {
 						resource: ['contact'],
 						operation: ['create', 'update'],
 					},
 				},
-				default: '',
-				description: 'Email address of the contact',
-			},
-			{
-				displayName: 'Notes',
-				name: 'notes',
-				type: 'string',
-				typeOptions: {
-					rows: 4,
-				},
-				displayOptions: {
-					show: {
-						resource: ['contact'],
-						operation: ['create', 'update'],
+				default: {},
+				options: [
+					{
+						displayName: 'Email',
+						name: 'email',
+						type: 'string',
+						placeholder: 'contact@example.com',
+						default: '',
+						description: 'Email address of the contact',
 					},
-				},
-				default: '',
-				description: 'Additional notes about the contact',
+					{
+						displayName: 'Notes',
+						name: 'notes',
+						type: 'string',
+						typeOptions: {
+							rows: 4,
+						},
+						default: '',
+						description: 'Additional notes about the contact',
+					},
+				],
 			},
 
-			// Event Registration fields
+			// Event Registration required fields
 			{
 				displayName: 'Event UUID',
 				name: 'eventUuid',
@@ -589,20 +600,6 @@ export class Orgo implements INodeType {
 				},
 				default: '',
 				description: 'The UUID of the event to register for',
-				required: true,
-			},
-			{
-				displayName: 'Event ID',
-				name: 'eventId',
-				type: 'string',
-				displayOptions: {
-					show: {
-						resource: ['eventAttend'],
-						operation: ['getAll'],
-					},
-				},
-				default: '',
-				description: 'The ID of the event to get registrations for',
 				required: true,
 			},
 			{
@@ -619,6 +616,54 @@ export class Orgo implements INodeType {
 				description: 'The ID of the user registering for the event',
 				required: true,
 			},
+			
+			// Event Registration additional fields
+			{
+				displayName: 'Additional Fields',
+				name: 'additionalFields',
+				type: 'collection',
+				placeholder: 'Add Field',
+				displayOptions: {
+					show: {
+						resource: ['eventAttend'],
+						operation: ['create'],
+					},
+				},
+				default: {},
+				options: [
+					{
+						displayName: 'Status',
+						name: 'status',
+						type: 'options',
+						options: [
+							{ name: 'Registered', value: 1 },
+							{ name: 'Attended', value: 3 },
+							{ name: 'Not Attending', value: 0 },
+							{ name: 'Invited', value: 2 },
+						],
+						default: 1,
+						description: 'The attendance status',
+					},
+				],
+			},
+			
+			// Event ID for getMany operation
+			{
+				displayName: 'Event ID',
+				name: 'eventId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['eventAttend'],
+						operation: ['getMany'],
+					},
+				},
+				default: '',
+				description: 'The ID of the event to get registrations for',
+				required: true,
+			},
+			
+			// Status for update operation
 			{
 				displayName: 'Status',
 				name: 'status',
@@ -626,7 +671,7 @@ export class Orgo implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['eventAttend'],
-						operation: ['create', 'update'],
+						operation: ['update'],
 					},
 				},
 				options: [
@@ -639,14 +684,39 @@ export class Orgo implements INodeType {
 				description: 'The attendance status',
 			},
 
-			// Limit parameter for getAll operations
+			// Output options for getMany operations
+			{
+				displayName: 'Output',
+				name: 'output',
+				type: 'options',
+				displayOptions: {
+					show: {
+						operation: ['getMany'],
+					},
+				},
+				options: [
+					{
+						name: 'Simplified',
+						value: 'simplified',
+						description: 'Returns simplified data with key fields only',
+					},
+					{
+						name: 'Raw',
+						value: 'raw',
+						description: 'Returns all available data',
+					},
+				],
+				default: 'simplified',
+			},
+			
+			// Limit parameter for getMany operations
 			{
 				displayName: 'Limit',
 				name: 'limit',
 				type: 'number',
 				displayOptions: {
 					show: {
-						operation: ['getAll'],
+						operation: ['getMany'],
 					},
 					hide: {
 						resource: ['eventAttend'],
@@ -667,7 +737,7 @@ export class Orgo implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['eventAttend'],
-						operation: ['getAll'],
+						operation: ['getMany'],
 					},
 				},
 				typeOptions: {
@@ -709,8 +779,9 @@ export class Orgo implements INodeType {
 						});
 						
 						responseData = response;
-					} else if (operation === 'getAll') {
+					} else if (operation === 'getMany') {
 						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const output = this.getNodeParameter('output', itemIndex, 'simplified') as string;
 						const url = `${baseURL}/users?limit=${limit}`;
 						
 						const response = await this.helpers.httpRequest({
@@ -722,17 +793,28 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						responseData = response;
+						if (output === 'simplified' && Array.isArray(response)) {
+							responseData = response.map((user: any) => ({
+								id: user.id,
+								email: user.email,
+								firstName: user.firstName,
+								lastName: user.lastName,
+								status: user.status,
+								createdAt: user.createdAt,
+							}));
+						} else {
+							responseData = response;
+						}
 					} else if (operation === 'create') {
 						const email = this.getNodeParameter('email', itemIndex) as string;
-						const firstName = this.getNodeParameter('firstName', itemIndex) as string;
-						const lastName = this.getNodeParameter('lastName', itemIndex) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
 						
-						const body = {
+						const body: any = {
 							email,
-							firstName,
-							lastName,
 						};
+						
+						if (additionalFields.firstName) body.firstName = additionalFields.firstName;
+						if (additionalFields.lastName) body.lastName = additionalFields.lastName;
 						
 						const url = `${baseURL}/member-register-by-admin`;
 						
@@ -790,8 +872,9 @@ export class Orgo implements INodeType {
 						});
 						
 						responseData = response;
-					} else if (operation === 'getAll') {
+					} else if (operation === 'getMany') {
 						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const output = this.getNodeParameter('output', itemIndex, 'simplified') as string;
 						const url = `${baseURL}/contacts?limit=${limit}`;
 						
 						const response = await this.helpers.httpRequest({
@@ -803,17 +886,28 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						responseData = response;
+						if (output === 'simplified' && Array.isArray(response)) {
+							responseData = response.map((contact: any) => ({
+								id: contact.id,
+								name: contact.name,
+								email: contact.email,
+								createdAt: contact.createdAt,
+							}));
+						} else {
+							responseData = response;
+						}
 					} else if (operation === 'create') {
-						const email = this.getNodeParameter('email', itemIndex) as string;
 						const firstName = this.getNodeParameter('firstName', itemIndex) as string;
 						const lastName = this.getNodeParameter('lastName', itemIndex) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
 						const name = firstName + ' ' + lastName;
 						
-						const body = {
-							email,
+						const body: any = {
 							name,
 						};
+						
+						if (additionalFields.email) body.email = additionalFields.email;
+						if (additionalFields.notes) body.notes = additionalFields.notes;
 						
 						const url = `${baseURL}/contacts`;
 						
@@ -859,8 +953,9 @@ export class Orgo implements INodeType {
 						});
 						
 						responseData = response;
-					} else if (operation === 'getAll') {
+					} else if (operation === 'getMany') {
 						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const output = this.getNodeParameter('output', itemIndex, 'simplified') as string;
 						const url = `${baseURL}/events?limit=${limit}`;
 						
 						const response = await this.helpers.httpRequest({
@@ -872,7 +967,19 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						responseData = response;
+						if (output === 'simplified' && Array.isArray(response)) {
+							responseData = response.map((event: any) => ({
+								id: event.id,
+								uuid: event.uuid,
+								title: event.title,
+								startDate: event.startDate,
+								endDate: event.endDate,
+								location: event.location,
+								status: event.status,
+							}));
+						} else {
+							responseData = response;
+						}
 					}
 				} else if (resource === 'eventAttend') {
 					if (operation === 'get') {
@@ -889,9 +996,10 @@ export class Orgo implements INodeType {
 						});
 						
 						responseData = response;
-					} else if (operation === 'getAll') {
+					} else if (operation === 'getMany') {
 						const page = this.getNodeParameter('page', itemIndex, 1) as number;
 						const eventId = this.getNodeParameter('eventId', itemIndex) as string;
+						const output = this.getNodeParameter('output', itemIndex, 'simplified') as string;
 						const url = `${baseURL}/event_attends?event=${eventId}&page=${page}&order[id]=desc`;
 						
 						const response = await this.helpers.httpRequest({
@@ -903,11 +1011,23 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						responseData = response;
+						if (output === 'simplified' && Array.isArray(response)) {
+							responseData = response.map((attend: any) => ({
+								id: attend.id,
+								userId: attend.user?.id || attend.user,
+								userName: attend.user?.name || attend.user?.firstName + ' ' + attend.user?.lastName,
+								eventId: attend.event?.id || attend.event,
+								status: attend.status,
+								createdAt: attend.createdAt,
+							}));
+						} else {
+							responseData = response;
+						}
 					} else if (operation === 'create') {
 						const eventUuid = this.getNodeParameter('eventUuid', itemIndex) as string;
 						const userId = this.getNodeParameter('userId', itemIndex) as string;
-						const status = this.getNodeParameter('status', itemIndex, 1) as number;
+						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
+						const status = additionalFields.status || 1;
 						
 						const body: any = {
 							event: `/api/v1/events/${eventUuid}`,
@@ -989,8 +1109,9 @@ export class Orgo implements INodeType {
 						});
 						
 						responseData = response;
-					} else if (operation === 'getAll') {
+					} else if (operation === 'getMany') {
 						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const output = this.getNodeParameter('output', itemIndex, 'simplified') as string;
 						const url = `${baseURL}/contract_users?limit=${limit}`;
 						
 						const response = await this.helpers.httpRequest({
@@ -1002,7 +1123,18 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						responseData = response;
+						if (output === 'simplified' && Array.isArray(response)) {
+							responseData = response.map((contract: any) => ({
+								id: contract.id,
+								userId: contract.user?.id || contract.user,
+								contractId: contract.contract?.id || contract.contract,
+								status: contract.status,
+								signedAt: contract.signedAt,
+								createdAt: contract.createdAt,
+							}));
+						} else {
+							responseData = response;
+						}
 					}
 				} else if (resource === 'productPayment') {
 					if (operation === 'get') {
@@ -1019,8 +1151,9 @@ export class Orgo implements INodeType {
 						});
 						
 						responseData = response;
-					} else if (operation === 'getAll') {
+					} else if (operation === 'getMany') {
 						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
+						const output = this.getNodeParameter('output', itemIndex, 'simplified') as string;
 						const url = `${baseURL}/product_payments?limit=${limit}`;
 						
 						const response = await this.helpers.httpRequest({
@@ -1032,143 +1165,20 @@ export class Orgo implements INodeType {
 							},
 						});
 						
-						responseData = response;
+						if (output === 'simplified' && Array.isArray(response)) {
+							responseData = response.map((payment: any) => ({
+								id: payment.id,
+								amount: payment.amount,
+								currency: payment.currency,
+								status: payment.status,
+								paidAt: payment.paidAt,
+								userId: payment.user?.id || payment.user,
+								createdAt: payment.createdAt,
+							}));
+						} else {
+							responseData = response;
+						}
 					}
-				} else if (resource === 'webhook') {
-					if (operation === 'get') {
-						const id = this.getNodeParameter('id', itemIndex) as string;
-						const url = `${baseURL}/webhook_subscriptions/${id}`;
-						
-						const response = await this.helpers.httpRequest({
-							method: 'GET',
-							url,
-							headers: {
-								'Api-Token': credentials.apiToken as string,
-								'Accept': 'application/json',
-							},
-						});
-						
-						responseData = response;
-					} else if (operation === 'getAll') {
-						const limit = this.getNodeParameter('limit', itemIndex, 25) as number;
-						const url = `${baseURL}/webhook_subscriptions?limit=${limit}`;
-						
-						const response = await this.helpers.httpRequest({
-							method: 'GET',
-							url,
-							headers: {
-								'Api-Token': credentials.apiToken as string,
-								'Accept': 'application/json',
-							},
-						});
-						
-						responseData = response;
-					} else if (operation === 'create') {
-						const name = this.getNodeParameter('name', itemIndex) as string;
-						const webhookUrl = this.getNodeParameter('url', itemIndex) as string;
-						const eventTypes = this.getNodeParameter('eventTypes', itemIndex) as string[];
-						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
-						
-						const body: any = {
-							name,
-							url: webhookUrl,
-							eventTypes,
-						};
-						
-						if (additionalFields.secret) body.secret = additionalFields.secret;
-						if (additionalFields.maxRetries) body.maxRetries = additionalFields.maxRetries;
-						if (additionalFields.timeoutSeconds) body.timeoutSeconds = additionalFields.timeoutSeconds;
-						if (additionalFields.description) body.description = additionalFields.description;
-						
-						const url = `${baseURL}/webhook_subscriptions`;
-						
-						const response = await this.helpers.httpRequest({
-							method: 'POST',
-							url,
-							headers: {
-								'Api-Token': credentials.apiToken as string,
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body,
-						});
-						
-						responseData = response;
-					} else if (operation === 'update') {
-						const id = this.getNodeParameter('id', itemIndex) as string;
-						const name = this.getNodeParameter('name', itemIndex) as string;
-						const webhookUrl = this.getNodeParameter('url', itemIndex) as string;
-						const eventTypes = this.getNodeParameter('eventTypes', itemIndex) as string[];
-						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
-						
-						const body: any = {
-							name,
-							url: webhookUrl,
-							eventTypes,
-						};
-						
-						if (additionalFields.secret) body.secret = additionalFields.secret;
-						if (additionalFields.maxRetries) body.maxRetries = additionalFields.maxRetries;
-						if (additionalFields.timeoutSeconds) body.timeoutSeconds = additionalFields.timeoutSeconds;
-						if (additionalFields.description) body.description = additionalFields.description;
-						
-						const url = `${baseURL}/webhook_subscriptions/${id}`;
-						
-						const response = await this.helpers.httpRequest({
-							method: 'PATCH',
-							url,
-							headers: {
-								'Api-Token': credentials.apiToken as string,
-								'Accept': 'application/json',
-								'Content-Type': 'application/merge-patch+json',
-							},
-							body,
-						});
-						
-						responseData = response;
-					} else if (operation === 'delete') {
-						const id = this.getNodeParameter('id', itemIndex) as string;
-						const url = `${baseURL}/webhook_subscriptions/${id}`;
-						
-						const response = await this.helpers.httpRequest({
-							method: 'DELETE',
-							url,
-							headers: {
-								'Api-Token': credentials.apiToken as string,
-								'Accept': 'application/json',
-							},
-						});
-						
-						responseData = response;
-					} else if (operation === 'test') {
-						const id = this.getNodeParameter('id', itemIndex) as string;
-						const url = `${baseURL}/webhook_subscriptions/${id}/test`;
-							
-						const response = await this.helpers.httpRequest({
-							method: 'POST',
-							url,
-							headers: {
-								'Api-Token': credentials.apiToken as string,
-								'Accept': 'application/json',
-							},
-						});
-						
-						responseData = response;
-					}
-				} else if (resource === 'custom') {
-					const customUrl = this.getNodeParameter('url', itemIndex) as string;
-					const url = `${baseURL}${customUrl}`;
-						
-					const response = await this.helpers.httpRequest({
-						method: 'GET',
-						url,
-						headers: {
-							'Api-Token': credentials.apiToken as string,
-							'Accept': 'application/json',
-						},
-					});
-					
-						responseData = response;
 				}
 				
 				if (Array.isArray(responseData)) {
