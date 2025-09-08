@@ -39,22 +39,28 @@ The main node for interacting with the Orgo API, supporting full CRUD operations
 - **Get User**: Retrieve user details by ID
 - **Get Many Users**: List multiple users with pagination
 - **Create User**: Register new users with email, first name, and last name
-- **Update User**: Modify existing user information
+
+#### **Contact Management**
+- **Get Contact**: Retrieve contact details by ID
+- **Get Many Contacts**: List multiple contacts with pagination
+- **Create Contact**: Add new external contacts with name and email
+- **Update Contact**: Modify contact information
+- **Delete Contact**: Remove contacts from the system
 
 #### **Event Management**  
-- **Get Event**: Retrieve event details by ID
+- **Get Event**: Retrieve event details by UUID
 - **Get Many Events**: List multiple events with pagination
 
-#### **Event Attendance**
-- **Get Attendance**: Retrieve attendance record by ID
-- **Get Many Attendances**: List attendance records with pagination
-- **Register for Event**: Create new event registration
-- **Update Attendance**: Modify attendance status (registered, attended, no_show, cancelled)
-- **Cancel Registration**: Remove event attendance
+#### **Event Registration**
+- **Get Registration**: Retrieve event registration by ID
+- **Get Event Registrations**: List all registrations for a specific event (paginated, 100 per page)
+- **Register for Event**: Create new event registration (requires event UUID and user ID)
+- **Update Registration Status**: Modify attendance status (Registered, Attended, Not Attending, Invited)
+- **Cancel Registration**: Remove event registration
 
-#### **Contract Management**
-- **Get Contract**: Retrieve contract details by ID
-- **Get Many Contracts**: List multiple contracts with pagination
+#### **Contract User Management**
+- **Get Contract User**: Retrieve contract user details by ID
+- **Get Many Contract Users**: List multiple contract users with pagination
 
 #### **Payment Management**
 - **Get Payment**: Retrieve payment record by ID  
@@ -75,12 +81,10 @@ The main node for interacting with the Orgo API, supporting full CRUD operations
 A trigger node that responds to Orgo webhooks for real-time automation and event-driven workflows.
 
 **Supported Event Types:**
-- **User Events**: `user.created`, `user.updated`, `user.deleted`
-- **Payment Events**: `product_payment.created`, `product_payment.updated`, `product_payment.deleted`
-- **Event Attendance**: `event_attend.created`, `event_attend.updated`, `event_attend.deleted`
-- **Contract Events**: `contract_user.created`, `contract_user.updated`, `contract_user.deleted`
-- **User Role Events**: `user_role.created`, `user_role.updated`, `user_role.deleted`
 - **Contact Events**: `contact.created`, `contact.updated`, `contact.deleted`
+- **Event Registration**: `event_attend.created`, `event_attend.updated`
+- **User Role Events**: `user_role.created`, `user_role.deleted`
+- **User Events**: `user.created`, `user.updated`
 
 ## Credentials
 

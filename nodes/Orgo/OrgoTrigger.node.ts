@@ -44,16 +44,32 @@ export class OrgoTrigger implements INodeType {
 				name: 'events',
 				type: 'multiOptions',
 				options: [
-					// User & Identity Events
+					// Contact Events
 					{
-						name: '[User] Created',
-						value: 'user.created',
-						description: 'Triggered when a new user registers or is created',
+						name: '[Contact] Created',
+						value: 'contact.created',
+						description: 'Triggered when a contact is created',
 					},
 					{
-						name: '[User] Updated',
-						value: 'user.updated',
-						description: 'Triggered when user information is updated',
+						name: '[Contact] Deleted',
+						value: 'contact.deleted',
+						description: 'Triggered when a contact is deleted',
+					},
+					{
+						name: '[Contact] Updated',
+						value: 'contact.updated',
+						description: 'Triggered when contact information is updated',
+					},
+					// Event Registration Events
+					{
+						name: '[Event] Registration Created',
+						value: 'event_attend.created',
+						description: 'Triggered when someone registers for an event',
+					},
+					{
+						name: '[Event] Registration Updated',
+						value: 'event_attend.updated',
+						description: 'Triggered when event attendance status changes',
 					},
 					// Role Events
 					{
@@ -66,32 +82,16 @@ export class OrgoTrigger implements INodeType {
 						value: 'user_role.deleted',
 						description: 'Triggered when a role is removed from a user',
 					},
-					// Contact Events
+					// User & Identity Events
 					{
-						name: '[Contact] Created',
-						value: 'contact.created',
-						description: 'Triggered when a contact is created',
+						name: '[User] Created',
+						value: 'user.created',
+						description: 'Triggered when a new user registers or is created',
 					},
 					{
-						name: '[Contact] Updated',
-						value: 'contact.updated',
-						description: 'Triggered when contact information is updated',
-					},
-					{
-						name: '[Contact] Deleted',
-						value: 'contact.deleted',
-						description: 'Triggered when a contact is deleted',
-					},
-					// Event Registration Events
-					{
-						name: '[Event] Registration Created',
-						value: 'event_attend.created',
-						description: 'Triggered when someone registers for an event',
-					},
-					{
-						name: '[Event] Registration Updated',
-						value: 'event_attend.updated',
-						description: 'Triggered when event attendance status changes',
+						name: '[User] Updated',
+						value: 'user.updated',
+						description: 'Triggered when user information is updated',
 					},
 				],
 				default: [],

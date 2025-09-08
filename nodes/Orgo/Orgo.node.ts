@@ -632,7 +632,7 @@ export class Orgo implements INodeType {
 				options: [
 					{ name: 'Registered', value: 1 },
 					{ name: 'Attended', value: 3 },
-					{ name: 'Not attending', value: 0 },
+					{ name: 'Not Attending', value: 0 },
 					{ name: 'Invited', value: 2 },
 				],
 				default: 1,
