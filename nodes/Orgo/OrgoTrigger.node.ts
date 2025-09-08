@@ -44,95 +44,54 @@ export class OrgoTrigger implements INodeType {
 				name: 'events',
 				type: 'multiOptions',
 				options: [
+					// User & Identity Events
 					{
-						name: 'Contact Created',
-						value: 'contact.created',
-						description: 'Triggered when a contact is created',
-					},
-					{
-						name: 'Contact Deleted',
-						value: 'contact.deleted',
-						description: 'Triggered when a contact is deleted',
-					},
-					{
-						name: 'Contact Updated',
-						value: 'contact.updated',
-						description: 'Triggered when contact information is updated',
-					},
-					{
-						name: 'Contract Deleted',
-						value: 'contract_user.deleted',
-						description: 'Triggered when a contract is removed or cancelled',
-					},
-					{
-						name: 'Contract Signed',
-						value: 'contract_user.created',
-						description: 'Triggered when a user signs a contract',
-					},
-					{
-						name: 'Contract Updated',
-						value: 'contract_user.updated',
-						description: 'Triggered when contract status or details change',
-					},
-					{
-						name: 'Event Attendance Updated',
-						value: 'event_attend.updated',
-						description: 'Triggered when event attendance status changes',
-					},
-					{
-						name: 'Event Registration',
-						value: 'event_attend.created',
-						description: 'Triggered when someone registers for an event',
-					},
-					{
-						name: 'Event Registration Cancelled',
-						value: 'event_attend.deleted',
-						description: 'Triggered when event registration is cancelled',
-					},
-					{
-						name: 'Payment Created',
-						value: 'product_payment.created',
-						description: 'Triggered when a new payment is processed',
-					},
-					{
-						name: 'Payment Deleted',
-						value: 'product_payment.deleted',
-						description: 'Triggered when a payment record is deleted',
-					},
-					{
-						name: 'Payment Updated',
-						value: 'product_payment.updated',
-						description: 'Triggered when payment status changes',
-					},
-					{
-						name: 'Role Assigned',
-						value: 'user_role.created',
-						description: 'Triggered when a role is assigned to a user',
-					},
-					{
-						name: 'Role Removed',
-						value: 'user_role.deleted',
-						description: 'Triggered when a role is removed from a user',
-					},
-					{
-						name: 'Role Updated',
-						value: 'user_role.updated',
-						description: 'Triggered when role permissions or details change',
-					},
-					{
-						name: 'User Created',
+						name: '[User] Created',
 						value: 'user.created',
 						description: 'Triggered when a new user registers or is created',
 					},
 					{
-						name: 'User Deleted',
-						value: 'user.deleted',
-						description: 'Triggered when a user account is deleted',
-					},
-					{
-						name: 'User Updated',
+						name: '[User] Updated',
 						value: 'user.updated',
 						description: 'Triggered when user information is updated',
+					},
+					// Role Events
+					{
+						name: '[Role] Assigned',
+						value: 'user_role.created',
+						description: 'Triggered when a role is assigned to a user',
+					},
+					{
+						name: '[Role] Removed',
+						value: 'user_role.deleted',
+						description: 'Triggered when a role is removed from a user',
+					},
+					// Contact Events
+					{
+						name: '[Contact] Created',
+						value: 'contact.created',
+						description: 'Triggered when a contact is created',
+					},
+					{
+						name: '[Contact] Updated',
+						value: 'contact.updated',
+						description: 'Triggered when contact information is updated',
+					},
+					{
+						name: '[Contact] Deleted',
+						value: 'contact.deleted',
+						description: 'Triggered when a contact is deleted',
+					},
+					// Event Registration Events
+					{
+						name: '[Event] Registration Created',
+						value: 'event_attend.created',
+						description: 'Triggered when someone registers for an event',
+					},
+					{
+						name: '[Event] Registration Updated',
+						value: 'event_attend.updated',
+						description: 'Triggered when event attendance status changes',
 					},
 				],
 				default: [],
