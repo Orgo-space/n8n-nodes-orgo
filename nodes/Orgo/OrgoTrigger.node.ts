@@ -209,28 +209,8 @@ export class OrgoTrigger implements INodeType {
 			},
 			
 			async delete(this: IHookFunctions): Promise<boolean> {
-				const webhookData = this.getWorkflowStaticData('node');
-				
-				if (webhookData.webhookId !== undefined) {
-					const credentials = await this.getCredentials('orgoApi');
-					const options = {
-						method: 'DELETE' as const,
-						url: `${credentials.apiUrl}/webhook_subscriptions/${webhookData.webhookId}`,
-						headers: {
-							'Api-Token': credentials.apiToken as string,
-						},
-					};
-
-					try {
-						await this.helpers.httpRequest(options);
-					} catch (error) {
-						return false;
-					}
-
-					// Remove from the static workflow data
-					delete webhookData.webhookId;
-				}
-				
+				// Never delete the webhook - just return true
+				// This keeps the webhook active in Orgo even when workflow is deactivated
 				return true;
 			},
 		},
