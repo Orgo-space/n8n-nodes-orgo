@@ -490,36 +490,33 @@ export class Orgo implements INodeType {
 				description: 'The email address of the user',
 				required: true,
 			},
-			
-			// User additional fields for create
 			{
-				displayName: 'Additional Fields',
-				name: 'additionalFields',
-				type: 'collection',
-				placeholder: 'Add Field',
+				displayName: 'First Name',
+				name: 'firstName',
+				type: 'string',
 				displayOptions: {
 					show: {
 						resource: ['user'],
 						operation: ['create'],
 					},
 				},
-				default: {},
-				options: [
-					{
-						displayName: 'First Name',
-						name: 'firstName',
-						type: 'string',
-						default: '',
-						description: 'The first name of the user',
+				default: '',
+				description: 'The first name of the user',
+				required: true,
+			},
+			{
+				displayName: 'Last Name',
+				name: 'lastName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['user'],
+						operation: ['create'],
 					},
-					{
-						displayName: 'Last Name',
-						name: 'lastName',
-						type: 'string',
-						default: '',
-						description: 'The last name of the user',
-					},
-				],
+				},
+				default: '',
+				description: 'The last name of the user',
+				required: true,
 			},
 
 			// Contact required fields
@@ -807,14 +804,14 @@ export class Orgo implements INodeType {
 						}
 					} else if (operation === 'create') {
 						const email = this.getNodeParameter('email', itemIndex) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', itemIndex, {}) as any;
+						const firstName = this.getNodeParameter('firstName', itemIndex) as string;
+						const lastName = this.getNodeParameter('lastName', itemIndex) as string;
 						
-						const body: any = {
+						const body = {
 							email,
+							firstName,
+							lastName,
 						};
-						
-						if (additionalFields.firstName) body.firstName = additionalFields.firstName;
-						if (additionalFields.lastName) body.lastName = additionalFields.lastName;
 						
 						const url = `${baseURL}/member-register-by-admin`;
 						
