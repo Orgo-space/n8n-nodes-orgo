@@ -1,27 +1,10 @@
 import {
 	IExecuteFunctions,
-	IExecuteSingleFunctions,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
-	NodeOperationError,
 } from 'n8n-workflow';
-
-// Route validation helper
-function validateRoute(url: string, method: string, requiredParams: string[] = []): void {
-	// Check if URL has proper API version prefix
-	if (!url.startsWith('/api/v1/')) {
-		}
-	
-	// Check for required parameters in URL template
-	for (const param of requiredParams) {
-		if (!url.includes(`{{$parameter["${param}"]}}`)) {
-			}
-	}
-	
-	// Log route validation
-}
 
 export class Orgo implements INodeType {
 	description: INodeTypeDescription = {
@@ -44,14 +27,6 @@ export class Orgo implements INodeType {
 				required: true,
 			},
 		],
-		requestDefaults: {
-			baseURL: '={{$credentials.apiUrl}}',
-			headers: {
-				'Api-Token': '={{$credentials.apiToken}}',
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-		},
 		properties: [
 			{
 				displayName: 'Resource',
@@ -110,61 +85,18 @@ export class Orgo implements INodeType {
 						value: 'get',
 						description: 'Get a user by ID',
 						action: 'Get a user',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/users/{{$parameter["id"]}}',
-							},
-							send: {
-								preSend: [
-									async function(this: IExecuteSingleFunctions, requestOptions: any) {
-										validateRoute('/api/v1/users/{{$parameter["id"]}}', 'GET', ['id']);
-										const id = this.getNodeParameter('id') as string;
-										if (!id || id.trim() === '') {
-											throw new NodeOperationError(this.getNode(), 'User ID is required but not provided');
-										}
-										return requestOptions;
-									},
-								],
-							},
-						},
 					},
 					{
 						name: 'Get Many',
 						value: 'getMany',
 						description: 'Get multiple users',
 						action: 'Get many users',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/users?limit={{$parameter["limit"] || 25}}',
-							},
-							send: {
-								preSend: [
-									async function(this: IExecuteSingleFunctions, requestOptions: any) {
-										validateRoute('/api/v1/users', 'GET', []);
-										return requestOptions;
-									},
-								],
-							},
-						},
 					},
 					{
 						name: 'Create',
 						value: 'create',
 						description: 'Create a new user',
 						action: 'Create a user',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '/users',
-								body: {
-									email: '={{$parameter["email"]}}',
-									firstName: '={{$parameter["firstName"]}}',
-									lastName: '={{$parameter["lastName"]}}',
-								},
-							},
-						},
 					},
 				],
 				default: 'get',
@@ -187,60 +119,30 @@ export class Orgo implements INodeType {
 						value: 'create',
 						description: 'Create a new contact',
 						action: 'Create contact',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '=/contacts',
-							},
-						},
 					},
 					{
 						name: 'Delete',
 						value: 'delete',
 						description: 'Delete a contact',
 						action: 'Delete contact',
-						routing: {
-							request: {
-								method: 'DELETE',
-								url: '=/contacts/{{$parameter["id"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get',
 						value: 'get',
 						description: 'Get a contact by ID',
 						action: 'Get contact',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/contacts/{{$parameter["id"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get Many',
 						value: 'getMany',
 						description: 'Get multiple contacts',
 						action: 'Get many contacts',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/contacts?limit={{$parameter["limit"] || 25}}',
-							},
-						},
 					},
 					{
 						name: 'Update',
 						value: 'update',
 						description: 'Update a contact',
 						action: 'Update contact',
-						routing: {
-							request: {
-								method: 'PATCH',
-								url: '=/contacts/{{$parameter["id"]}}',
-							},
-						},
 					},
 				],
 				default: 'get',
@@ -263,24 +165,12 @@ export class Orgo implements INodeType {
 						value: 'get',
 						description: 'Get an event by UUID',
 						action: 'Get an event',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/events/{{$parameter["uuid"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get Many',
 						value: 'getMany',
 						description: 'Get multiple events',
 						action: 'Get many events',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/events?limit={{$parameter["limit"] || 25}}',
-							},
-						},
 					},
 				],
 				default: 'get',
@@ -303,60 +193,30 @@ export class Orgo implements INodeType {
 						value: 'create',
 						description: 'Register for an event',
 						action: 'Register for event',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '=/event_attends',
-							},
-						},
 					},
 					{
 						name: 'Delete',
 						value: 'delete',
 						description: 'Cancel event registration',
 						action: 'Cancel event registration',
-						routing: {
-							request: {
-								method: 'DELETE',
-								url: '=/event_attends/{{$parameter["id"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get',
 						value: 'get',
 						description: 'Get an event registration by ID',
 						action: 'Get event registration',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/event_attends/{{$parameter["id"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get Many',
 						value: 'getMany',
 						description: 'Get event registrations for a specific event',
 						action: 'Get many event registrations',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/event_attends?event={{$parameter["eventId"]}}&page={{$parameter["page"] || 1}}&order[id]=desc',
-							},
-						},
 					},
 					{
 						name: 'Update',
 						value: 'update',
 						description: 'Update event registration/attendance status',
 						action: 'Update event registration',
-						routing: {
-							request: {
-								method: 'PATCH',
-								url: '=/event_attends/{{$parameter["id"]}}',
-							},
-						},
 					},
 				],
 				default: 'get',
@@ -379,24 +239,12 @@ export class Orgo implements INodeType {
 						value: 'get',
 						description: 'Get a contract user by ID',
 						action: 'Get a contract user',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/contract_users/{{$parameter["id"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get Many',
 						value: 'getMany',
 						description: 'Get multiple contract users',
 						action: 'Get many contract users',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/contract_users?limit={{$parameter["limit"] || 25}}',
-							},
-						},
 					},
 				],
 				default: 'get',
@@ -419,24 +267,12 @@ export class Orgo implements INodeType {
 						value: 'get',
 						description: 'Get a payment by ID',
 						action: 'Get a payment',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/product_payments/{{$parameter["id"]}}',
-							},
-						},
 					},
 					{
 						name: 'Get Many',
 						value: 'getMany',
 						description: 'Get multiple payments',
 						action: 'Get many payments',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/product_payments?limit={{$parameter["limit"] || 25}}',
-							},
-						},
 					},
 				],
 				default: 'get',
@@ -1179,14 +1015,23 @@ export class Orgo implements INodeType {
 				}
 				
 				if (Array.isArray(responseData)) {
-					returnData.push(...responseData.map(item => ({ json: item })));
+					returnData.push(...responseData.map(item => ({
+						json: item,
+						pairedItem: { item: itemIndex },
+					})));
 				} else if (responseData) {
-					returnData.push({ json: responseData });
+					returnData.push({
+						json: responseData,
+						pairedItem: { item: itemIndex },
+					});
 				}
 				
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: error.message } });
+					returnData.push({
+						json: { error: error.message },
+						pairedItem: { item: itemIndex },
+					});
 					continue;
 				}
 				throw error;
