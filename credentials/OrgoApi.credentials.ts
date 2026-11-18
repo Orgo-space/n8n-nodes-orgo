@@ -38,7 +38,8 @@ export class OrgoApi implements ICredentialType {
 				password: true,
 			},
 			required: false,
-			description: 'Secret key for webhook signature verification (recommended for security)',
+			description:
+				'Secret used to sign webhook deliveries (HMAC-SHA256). Use a random string of at least 32 characters. Without it the Orgo Trigger cannot authenticate incoming requests.',
 		},
 		{
 			displayName: 'Tenant ID',

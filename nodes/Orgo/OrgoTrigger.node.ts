@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from 'crypto';
 import {
 	IHookFunctions,
 	IWebhookFunctions,
@@ -103,7 +104,8 @@ export class OrgoTrigger implements INodeType {
 				name: 'verifySignature',
 				type: 'boolean',
 				default: true,
-				description: 'Whether to verify webhook signatures for security (recommended)',
+				description:
+					'Whether to verify the HMAC-SHA256 webhook signature (recommended). Requires a Webhook Secret in the credential; without one, Orgo sends no signature and any request to this URL is accepted.',
 			},
 			{
 				displayName: 'Options',
@@ -224,22 +226,25 @@ export class OrgoTrigger implements INodeType {
 		// Verify webhook signature if enabled and secret is provided
 		if (verifySignature) {
 			const credentials = await this.getCredentials('orgoApi');
-			
+
 			if (credentials.webhookSecret) {
-				const signature = headers['x-webhook-signature'] as string;
-				
-				if (!signature) {
-					throw new NodeOperationError(this.getNode(), 'Webhook signature missing');
+				const req = this.getRequestObject();
+				if (!req.rawBody && typeof req.readRawBody === 'function') {
+					await req.readRawBody();
 				}
 
 				const isValid = verifyWebhookSignature(
-					JSON.stringify(body),
-					signature,
-					credentials.webhookSecret as string
+					req.rawBody,
+					headers['x-webhook-signature'] as string | undefined,
+					credentials.webhookSecret as string,
 				);
 
 				if (!isValid) {
-					throw new NodeOperationError(this.getNode(), 'Invalid webhook signature');
+					// Answer 401 instead of throwing: a forged request must not start the
+					// workflow, and a 4xx is logged as a failed delivery in Orgo.
+					const res = this.getResponseObject();
+					res.status(401).json({ error: 'Invalid or missing webhook signature' });
+					return { noWebhookResponse: true };
 				}
 			}
 		}
@@ -288,23 +293,51 @@ export class OrgoTrigger implements INodeType {
 
 }
 
-function verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
-	try {
-		if (!signature || !secret || signature.length === 0) {
-			return false;
-		}
-		
-		const combinedString = payload + '|' + secret;
-		let hash = 0;
-		for (let i = 0; i < combinedString.length; i++) {
-			const char = combinedString.charCodeAt(i);
-			hash = ((hash << 5) - hash) + char;
-			hash = hash & hash;
-		}
-		
-		const expectedSignature = Math.abs(hash).toString(16);
-		return signature === expectedSignature;
-	} catch (error) {
+// Maximum age of a signed delivery, in seconds. Orgo re-signs every retry with a
+// fresh timestamp, so this only rejects replays of captured requests.
+const SIGNATURE_TOLERANCE_SECONDS = 300;
+
+/**
+ * Verifies Orgo's `X-Webhook-Signature: t=<unix seconds>,v1=<hex>` header, where v1 is
+ * HMAC-SHA256(secret, "<t>.<raw body>"). The raw body must be used as received: Orgo
+ * signs PHP's json_encode output, which re-serialising the parsed body does not reproduce.
+ */
+function verifyWebhookSignature(
+	rawBody: Buffer | undefined,
+	header: string | undefined,
+	secret: string,
+): boolean {
+	if (!rawBody || !header || !secret) {
 		return false;
 	}
+
+	let timestamp: string | undefined;
+	const candidates: string[] = [];
+	for (const part of header.split(',')) {
+		const idx = part.indexOf('=');
+		if (idx === -1) continue;
+		const key = part.slice(0, idx).trim();
+		const value = part.slice(idx + 1).trim();
+		if (key === 't') timestamp = value;
+		else if (key === 'v1') candidates.push(value);
+	}
+
+	if (!timestamp || !/^\d+$/.test(timestamp) || candidates.length === 0) {
+		return false;
+	}
+
+	const age = Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp));
+	if (age > SIGNATURE_TOLERANCE_SECONDS) {
+		return false;
+	}
+
+	const expected = createHmac('sha256', secret)
+		.update(`${timestamp}.`)
+		.update(rawBody)
+		.digest();
+
+	return candidates.some((candidate) => {
+		if (!/^[0-9a-f]{64}$/.test(candidate)) return false;
+		return timingSafeEqual(expected, Buffer.from(candidate, 'hex'));
+	});
 }
